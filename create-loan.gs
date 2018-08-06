@@ -21,9 +21,8 @@ function openCreateLoanPopup() {
  * Called by HTML button in popup
  */
 function createLoan(data) {
-    SpreadsheetApp.getUi().alert ("Loan is being imported. Please wait for it to be fully created");
+    SpreadsheetApp.getUi().alert ('Loan is being imported. It will appear in the "Loans" tab shrotly');
     appendLoanToLoansSheet(data);
-    appendTestInterests(data);
 }
 
 function appendLoanToLoansSheet(data){
@@ -42,3 +41,5 @@ function appendLoanToLoansSheet(data){
     row[ColumnNames.letterToColumnStart0('L')] = data.borrowerEntity;
     SpreadsheetApp.openById(LOAN_TRACKER_SPREADSHEET_ID).getSheetByName(LOAN_TRACKER_SPREADSHEET.loansSheet.name).appendRow(row);
 }
+
+
