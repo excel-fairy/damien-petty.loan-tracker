@@ -52,14 +52,6 @@ function sendEmail(attachment) {
     }
 }
 
-function getEntitiesNames(){
-    var entities = INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.sheet.getRange(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.r1,
-        INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c1,
-        INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.r2 - INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.r1,
-        INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c2 - INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c1+1).getValues();
-    return entities.map(function(entity){return entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entityNameColumn];});
-}
-
 function getEntityFromName(entityName){
     var entities = INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.sheet.getRange(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.r1,
         INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c1,
