@@ -16,6 +16,18 @@ function openCreateLoanPopup() {
 }
 
 
+function createLoanDebug(){
+    insertLoanInLoansSheet({
+        entityName:"Accordus Pty Ltd",
+        amountBorrowed: 45,
+        dateBorrowed: new Date(),
+        dueDate: new Date(),
+        interestRate: 12,
+        borrowerEntity: "Antra group"
+    })
+}
+
+
 /**
  * Main function
  * Called by HTML button in popup
@@ -26,20 +38,22 @@ function createLoan(data) {
 }
 
 function insertLoanInLoansSheet(data){
-    data.loanReference =  getLastLoanReferenceOfEntity(data.entityName);
+    data.loanReference =  getIncrementedLoanReference(getLastLoanReferenceOfEntity(data.entityName));
     var rowToInsert = buildLoanToInsert(data);
     var loansOriginalSheet = getLoansOriginalSheet();
-    loansOriginalSheet.insertRowAfter(lastEntityRow);
+    var lastEntityRow = getLastLoanOfEntityRow(data.entityName);
     var rangeRowToSet = loansOriginalSheet.getRange(lastEntityRow + 1,
         ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
         ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.lastLoansColumn)
-        - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
+        - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn));
     rangeRowToSet.setValues([rowToInsert]);
 }
 
-function duplicateLastEntoityRow(lastEntityRow,){
+// Duplicate row to get all the data that won't be overwritten
+function duplicateLastEntityRow(lastEntityRow){
     var loansOriginalSheet = getLoansOriginalSheet();
+    loansOriginalSheet.insertRowAfter(lastEntityRow);
     var lastRangeRowOfEntity = loansOriginalSheet.getRange(lastEntityRow,
         ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
@@ -48,14 +62,14 @@ function duplicateLastEntoityRow(lastEntityRow,){
     var rangeRowToCopyDestination = loansOriginalSheet.getRange(lastEntityRow + 1,
         ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
-        ColumnNames.letterToColumn(loansOriginalSheet.lastLoansColumn)
+        loansOriginalSheet.getLastColumn()
         - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
     lastRangeRowOfEntity.copyTo(rangeRowToCopyDestination);
 }
 
 function buildLoanToInsert(data) {
     var row = [];
-    row[ColumnNames.letterToColumnStart0('A')] = 'TODO'; //TODO
+    row[ColumnNames.letterToColumnStart0('A')] = data.loanReference;
     row[ColumnNames.letterToColumnStart0('B')] = '';
     row[ColumnNames.letterToColumnStart0('C')] = data.entityName;
     row[ColumnNames.letterToColumnStart0('D')] = data.amountBorrowed;
@@ -70,25 +84,65 @@ function buildLoanToInsert(data) {
     return row;
 }
 
-function getLastLoanReferenceOfEntity(entityName) {
-    var loansOriginalSheet = getLoansOriginalSheet();
-    var lastLoanOfEntityRow = getLastLoanOfEntityRow(entityName);
-    return loansOriginalSheet.getRange(lastLoanOfEntityRow, LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn).getValue();
-}
-
-function getLastLoanOfEntityRow(entityName){
-    var loansOriginalSheet = getLoansOriginalSheet();
-    var loans = loansOriginalSheet.getRange(2,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
-        loansOriginalSheet.getLastRow(),
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn) -
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn)+1);
-    //TODO
-
-}
 
 function getLoansOriginalSheet() {
     return SpreadsheetApp.openById(LOAN_TRACKER_SPREADSHEET_ID).getSheetByName(LOAN_TRACKER_SPREADSHEET.loansSheet.name);
 }
 
+function getLastLoanReferenceOfEntity(entityName) {
+    var loansOriginalSheet = getLoansOriginalSheet();
+    var lastLoanOfEntityRow = getLastLoanOfEntityRow(entityName);
+    return loansOriginalSheet.getRange(lastLoanOfEntityRow,
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn)).getValue();
+}
 
+function getLastLoanOfEntityRow(entityName) {
+    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansRange = loansOriginalSheet.getRange(2,
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        loansOriginalSheet.getLastRow(),
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn) -
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn)+1);
+    var allLoans = loansRange.getValues();
+    var loanReference = getLastLoanOfEntity(entityName);
+    for(var i=0; i < allLoans.length; i++){
+        var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn)];
+        if( currentLoanReference === loanReference)
+            return i + 1 + (LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoanRow - 1);
+    }
+    return -1;
+}
+
+function getLastLoanOfEntity(entityName){
+    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansRange = loansOriginalSheet.getRange(2,
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        loansOriginalSheet.getLastRow(),
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn) -
+        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn)+1);
+    var allLoans = loansRange.getValues();
+    var entityNameColS0 = ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn);
+    var loanReferenceColS0 = ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn);
+    allLoans = allLoans.filter(function (loan) {
+        return loan[entityNameColS0] === entityName;
+    });
+    allLoans.sort(function (a, b) {
+        return b[loanReferenceColS0].localeCompare([loanReferenceColS0]);
+    });
+    return allLoans[allLoans.length-1][loanReferenceColS0];
+}
+
+function getIncrementedLoanReference(loanReference) {
+    // Split in two strings: letters, and digits (loan references
+    // are a concatenation of a group of letters and a group of numbers
+    var splittedLoanReference = loanReference.match(/[a-zA-Z]+|[0-9]+/g);
+    var loanNumberStr = splittedLoanReference[1];
+    var loanNumberStrLength = loanNumberStr.length;
+    var loanNumber = parseInt(loanNumberStr, 10);
+    var incrementedLoanNumber = loanNumber+1;
+    var incrementedLoanNumberStr = ""+incrementedLoanNumber;
+    while (incrementedLoanNumberStr.length < loanNumberStrLength) {
+        incrementedLoanNumberStr = "0" + incrementedLoanNumberStr;
+    }
+    return splittedLoanReference[0] + incrementedLoanNumberStr;
+}

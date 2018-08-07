@@ -47,6 +47,7 @@ var INTEREST_STATEMENT_SPREADSHEET = {
 var LOAN_TRACKER_SPREADSHEET = {
     loansSheet : {
         name: 'Loans',
+        firstLoanRow: '2',
         firstLoansColumn: 'A',
         lastLoansColumn: 'M',
         loanReferenceColumn: 'A',
