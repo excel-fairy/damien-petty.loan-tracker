@@ -41,11 +41,9 @@ var INTEREST_STATEMENT_SPREADSHEET = {
     calcSheet: {
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Calc"),
         lastInvoiceNumberCell: 'I2'
-    }
-};
-
-var LOAN_TRACKER_SPREADSHEET = {
-    loansSheet : {
+    },
+    loansSheet: {
+        sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Loans"),
         name: 'Loans',
         firstLoanRow: '2',
         firstLoansColumn: 'A',

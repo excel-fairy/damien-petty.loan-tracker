@@ -40,30 +40,30 @@ function createLoan(data) {
 function insertLoanInLoansSheet(data){
     data.loanReference =  getIncrementedLoanReference(getLastLoanReferenceOfEntity(data.entityName));
     var rowToInsert = buildLoanToInsert(data);
-    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var lastEntityRow = getLastLoanOfEntityRow(data.entityName);
     var rangeRowToSet = loansOriginalSheet.getRange(lastEntityRow + 1,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.lastLoansColumn)
-        - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn));
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.lastLoansColumn)
+        - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn));
     rangeRowToSet.setValues([rowToInsert]);
 }
 
 // Duplicate row to get all the data that won't be overwritten
 function duplicateLastEntityRow(lastEntityRow){
-    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     loansOriginalSheet.insertRowAfter(lastEntityRow);
     var lastRangeRowOfEntity = loansOriginalSheet.getRange(lastEntityRow,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
         loansOriginalSheet.getLastColumn()
-        - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
+        - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
     var rangeRowToCopyDestination = loansOriginalSheet.getRange(lastEntityRow + 1,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
         loansOriginalSheet.getLastColumn()
-        - ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
+        - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn) + 1);
     lastRangeRowOfEntity.copyTo(rangeRowToCopyDestination);
 }
 
@@ -76,7 +76,7 @@ function buildLoanToInsert(data) {
     row[ColumnNames.letterToColumnStart0('E')] = data.dateBorrowed;
     row[ColumnNames.letterToColumnStart0('F')] = '☐';
     row[ColumnNames.letterToColumnStart0('G')] = data.dueDate;
-    row[ColumnNames.letterToColumnStart0('H')] = data.interestRate;
+    row[ColumnNames.letterToColumnStart0('H')] = data.interestRate + '%';
     row[ColumnNames.letterToColumnStart0('I')] = data.interestRate * data.amountBorrowed;
     row[ColumnNames.letterToColumnStart0('J')] = 'No';
     row[ColumnNames.letterToColumnStart0('K')] = '';
@@ -85,44 +85,40 @@ function buildLoanToInsert(data) {
 }
 
 
-function getLoansOriginalSheet() {
-    return SpreadsheetApp.openById(LOAN_TRACKER_SPREADSHEET_ID).getSheetByName(LOAN_TRACKER_SPREADSHEET.loansSheet.name);
-}
-
 function getLastLoanReferenceOfEntity(entityName) {
-    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var lastLoanOfEntityRow = getLastLoanOfEntityRow(entityName);
     return loansOriginalSheet.getRange(lastLoanOfEntityRow,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn)).getValue();
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)).getValue();
 }
 
 function getLastLoanOfEntityRow(entityName) {
-    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var loansRange = loansOriginalSheet.getRange(2,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         loansOriginalSheet.getLastRow(),
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn) -
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn)+1);
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn) -
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn)+1);
     var allLoans = loansRange.getValues();
     var loanReference = getLastLoanOfEntity(entityName);
     for(var i=0; i < allLoans.length; i++){
-        var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn)];
+        var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)];
         if( currentLoanReference === loanReference)
-            return i + 1 + (LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoanRow - 1);
+            return i + 1 + (INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1);
     }
     return -1;
 }
 
 function getLastLoanOfEntity(entityName){
-    var loansOriginalSheet = getLoansOriginalSheet();
+    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var loansRange = loansOriginalSheet.getRange(2,
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn),
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         loansOriginalSheet.getLastRow(),
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn) -
-        ColumnNames.letterToColumn(LOAN_TRACKER_SPREADSHEET.loansSheet.firstLoansColumn)+1);
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn) -
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn)+1);
     var allLoans = loansRange.getValues();
-    var entityNameColS0 = ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.entityNameColumn);
-    var loanReferenceColS0 = ColumnNames.letterToColumnStart0(LOAN_TRACKER_SPREADSHEET.loansSheet.loanReferenceColumn);
+    var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
+    var loanReferenceColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn);
     allLoans = allLoans.filter(function (loan) {
         return loan[entityNameColS0] === entityName;
     });
