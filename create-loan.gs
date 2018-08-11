@@ -76,7 +76,7 @@ function buildLoanToInsert(data) {
     row[ColumnNames.letterToColumnStart0('C')] = data.entityName;
     row[ColumnNames.letterToColumnStart0('D')] = data.amountBorrowed;
     row[ColumnNames.letterToColumnStart0('E')] = data.dateBorrowed;
-    row[ColumnNames.letterToColumnStart0('F')] = '☐';
+    row[ColumnNames.letterToColumnStart0('F')] = '';
     row[ColumnNames.letterToColumnStart0('G')] = data.dueDate;
     row[ColumnNames.letterToColumnStart0('H')] = data.interestRate + '%';
     row[ColumnNames.letterToColumnStart0('I')] = data.interestRate * data.amountBorrowed;
