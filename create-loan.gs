@@ -47,6 +47,8 @@ function insertLoanInLoansSheet(data){
         1,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.lastLoansColumn)
         - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn));
+
+    duplicateLastEntityRow(lastEntityRow);
     rangeRowToSet.setValues([rowToInsert]);
 }
 
