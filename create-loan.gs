@@ -10,8 +10,8 @@ function openCreateLoanPopup() {
     };
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setTitle('Import loan')
-        .setWidth(900)
-        .setHeight(500);
+        .setWidth(705)
+        .setHeight(360);
     SpreadsheetApp.getUi().showDialog(htmlOutput);
 }
 
