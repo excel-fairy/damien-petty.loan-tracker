@@ -16,18 +16,6 @@ function openCreateLoanPopup() {
 }
 
 
-function createLoanDebug(){
-    insertLoanInLoansSheet({
-        entityName:"Accordus Pty Ltd",
-        amountBorrowed: 45,
-        dateBorrowed: new Date(),
-        dueDate: new Date(),
-        interestRate: 12,
-        borrowerEntity: "Antra group"
-    })
-}
-
-
 /**
  * Main function
  * Called by HTML button in popup
