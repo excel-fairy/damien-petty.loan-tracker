@@ -1,10 +1,13 @@
 var INTEREST_STATEMENT_SPREADSHEET = {
     entitiesSheet: { // ImportRange from Loan tracker spradsheet
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Entity"),
-        entityNameColumn: ColumnNames.letterToColumnStart0('A'),
-        emailAddressColumn: ColumnNames.letterToColumnStart0('G'),
-        emailSubjectColumn: ColumnNames.letterToColumnStart0('M'),
-        emailBodyColumn: ColumnNames.letterToColumnStart0('N'),
+        firstEntityRow: 3,
+        firstEntityColumn: 'A',
+        lastEntityColumn: 'O',
+        entityNameColumn: 'A',
+        emailAddressColumn: 'G',
+        emailSubjectColumn: 'M',
+        emailBodyColumn: 'N',
         carbonCopyEmailAddressesColumn: ColumnNames.letterToColumnStart0('O'),
         entitiesListRange:{
             r1: 3,

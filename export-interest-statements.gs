@@ -59,7 +59,7 @@ function getEntityFromName(entityName){
         INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c2 - INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entitiesListRange.c1+1).getValues();
 
     for (var i=0; i < entities.length; i++){
-        if(entities[i][INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entityNameColumn] === entityName)
+        if(entities[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.entityNameColumn)] === entityName)
             return entities[i];
     }
     return null;
