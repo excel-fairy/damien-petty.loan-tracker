@@ -59,6 +59,7 @@ function duplicateLastEntityRow(lastEntityRow){
 
 function buildLoanToInsert(data) {
     var row = [];
+    var interestRatePercent = data.interestRate / 100;
     row[ColumnNames.letterToColumnStart0('A')] = data.loanReference;
     row[ColumnNames.letterToColumnStart0('B')] = '';
     row[ColumnNames.letterToColumnStart0('C')] = data.entityName;
@@ -66,8 +67,8 @@ function buildLoanToInsert(data) {
     row[ColumnNames.letterToColumnStart0('E')] = data.dateBorrowed;
     row[ColumnNames.letterToColumnStart0('F')] = '';
     row[ColumnNames.letterToColumnStart0('G')] = data.dueDate;
-    row[ColumnNames.letterToColumnStart0('H')] = data.interestRate + '%';
-    row[ColumnNames.letterToColumnStart0('I')] = data.interestRate * data.amountBorrowed;
+    row[ColumnNames.letterToColumnStart0('H')] = interestRatePercent;
+    row[ColumnNames.letterToColumnStart0('I')] = interestRatePercent * data.amountBorrowed;
     row[ColumnNames.letterToColumnStart0('J')] = 'No';
     row[ColumnNames.letterToColumnStart0('K')] = '';
     row[ColumnNames.letterToColumnStart0('L')] = data.borrowerEntity;
