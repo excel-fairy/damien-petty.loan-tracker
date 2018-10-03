@@ -11,7 +11,7 @@ function openCreateLoanPopup() {
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setTitle('Import loan')
         .setWidth(705)
-        .setHeight(360);
+        .setHeight(400);
     SpreadsheetApp.getUi().showDialog(htmlOutput);
 }
 
@@ -26,7 +26,9 @@ function createLoan(data) {
 }
 
 function insertLoanInLoansSheet(data){
-    data.loanReference =  getIncrementedLoanReference(getLastLoanReferenceOfEntity(data.entityName));
+    // Override loanReference (autocomputed) only if the entity is none of the below
+    if(data.entityName !== 'Dacosi Investments Pty Ltd (Derek Goh)' && data.entityName !== 'Dacosi ST Pty Ltd (Derek Goh)')
+        data.loanReference =  getIncrementedLoanReference(getLastLoanReferenceOfEntity(data.entityName));
     var rowToInsert = buildLoanToInsert(data);
     var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var lastEntityRow = getLastLoanOfEntityRow(data.entityName);

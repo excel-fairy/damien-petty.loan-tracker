@@ -7,7 +7,7 @@
 <form id="myForm" onsubmit="event.preventDefault(); google.script.run.createLoan(this); google.script.host.close()">
     <label>
         Entity name:
-        <select name="entityName">
+        <select name="entityName" onclick="disableLoanReferenceInputIfNeeded()" id="entity-select">
             <? for (var i = 0; i < data.entities.length; i++) { ?>
             <option value="<?= data.entities[i] ?>"> <?= data.entities[i] ?>
                 <? } ?>
@@ -15,6 +15,11 @@
     </label>
     <br><br>
 
+    <label>
+        Loan reference (Dacosi only):
+        <input type="text" name="loanReference" id="loan-reference-input" disabled>
+    </label>
+    <br><br>
     <label>
         Amount borrowed:
         <input type="number" name="amountBorrowed" min="0" step="0.01" value="0">$
@@ -60,6 +65,13 @@
     Array.from(document.getElementsByClassName('date-picker')).forEach(
         function(e) {
             e.value = new Date().toDateInputValue();
-        });
+        }
+    );
+    function disableLoanReferenceInputIfNeeded() {
+        var entitySelectDom = document.getElementById("entity-select");
+        var selectedEntity = entitySelectDom.options[entitySelectDom.selectedIndex].value;
+        document.getElementById("loan-reference-input").disabled = !(selectedEntity === 'Dacosi Investments Pty Ltd (Derek Goh)' || selectedEntity === 'Dacosi ST Pty Ltd (Derek Goh)');
+    }
+
 
 </script>
