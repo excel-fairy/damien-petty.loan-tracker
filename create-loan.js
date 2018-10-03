@@ -92,12 +92,13 @@ function getLastLoanOfEntityRow(entityName) {
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn)+1);
     var allLoans = loansRange.getValues();
     var loanReference = getLastLoanOfEntity(entityName);
+    var lastRow = -1;
     for(var i=0; i < allLoans.length; i++){
         var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)];
         if( currentLoanReference === loanReference)
-            return i + 1 + (INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1);
+            lastRow = i + 1 + (INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1);
     }
-    return -1;
+    return lastRow;
 }
 
 function getLastLoanOfEntity(entityName){
