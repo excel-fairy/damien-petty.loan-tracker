@@ -12,3 +12,15 @@ function getChildFolderByNameAndCreateIfNotExist(parentFolderId, childFolderName
     }
     return parentFolder.createFolder(childFolderName); // Create child folder with specified name and return it
 }
+
+
+/**
+ * Has it been more than 4.5 min since start date ?
+ * @param start
+ * @return {boolean}
+ * @private
+ */
+function isTimeUp(start) {
+    var now = new Date();
+    return now.getTime() - start.getTime() > 270000; // 4.5 minutes
+}

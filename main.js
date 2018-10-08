@@ -27,7 +27,8 @@ var INTEREST_STATEMENT_SPREADSHEET = {
             r2: 47,
             c1: 1,
             c2: 8
-        }
+        },
+        exportStatusCell: 'F3'
     },
     invoicesSheet: {
         name: 'Invoices',
@@ -43,7 +44,8 @@ var INTEREST_STATEMENT_SPREADSHEET = {
     },
     calcSheet: {
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Calc"),
-        lastInvoiceNumberCell: 'I2'
+        lastInvoiceNumberCell: 'I2',
+        currentlyExportingEntityCell: 'G16'
     },
     loansSheet: {
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Loans"),
