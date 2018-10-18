@@ -50,7 +50,7 @@ var INTEREST_STATEMENT_SPREADSHEET = {
     loansSheet: {
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Loans"),
         name: 'Loans',
-        firstLoanRow: '2',
+        firstLoanRow: 3,
         firstLoansColumn: 'A',
         lastLoansColumn: 'M',
         loanReferenceColumn: 'A',

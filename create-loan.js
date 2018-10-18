@@ -86,36 +86,67 @@ function getLastLoanReferenceOfEntity(entityName) {
 }
 
 function getLastLoanOfEntityRow(entityName) {
-    var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
-    var loansRange = loansOriginalSheet.getRange(2,
-        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
-        loansOriginalSheet.getLastRow(),
-        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn) -
-        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn)+1);
-    var allLoans = loansRange.getValues();
-    var loanReference = getLastLoanOfEntity(entityName);
     var lastRow = -1;
-    for(var i=0; i < allLoans.length; i++){
-        var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)];
-        if( currentLoanReference === loanReference)
-            lastRow = i + 1 + (INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1);
+    var allLoans = getAllLoans();
+    var loanReference = getLastLoanReferenceOfEntity(entityName);
+    if(loanReference !== null) { // A loan of this entity has already been imported
+        for(var i=0; i < allLoans.length; i++){
+            var currentLoanReference = allLoans[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)];
+            if( currentLoanReference === loanReference)
+                lastRow = i + INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow;
+        }
+        return lastRow;
     }
-    return lastRow;
+    else { // First loan of this entity to be imported
+        var beforeEntityLoan = getLastLoanOfEntityBeforeThisEntity(entityName);
+        if(beforeEntityLoan !== null) {
+            var beforeEntityName = beforeEntityLoan[ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn)];
+            for (var i = 0; i < allLoans.length; i++) {
+                var currentLoanEntityName = allLoans[i][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn)];
+                if (currentLoanEntityName === beforeEntityName)
+                    lastRow = i + INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow;
+            }
+            return lastRow;
+        }
+        else // First loan of this entity to be imported and no entity with a name before this one in the list of loans
+            return INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1;
+    }
 }
 
-function getLastLoanOfEntity(entityName){
+function getAllLoans() {
     var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
-    var loansRange = loansOriginalSheet.getRange(2,
+    var loansRange = loansOriginalSheet.getRange(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         loansOriginalSheet.getLastRow(),
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn) -
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn)+1);
-    var allLoans = loansRange.getValues();
+    return loansRange.getValues();
+}
+
+function getLastLoanOfEntityBeforeThisEntity(entityName) {
+    var allLoans = getAllLoans();
+    var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
+    var retVal = null;
+    for (var i = 0; i < allLoans.length; i++) {
+        var currentLoan = allLoans[i];
+        var currentLoanName = currentLoan[entityNameColS0];
+        if(currentLoanName !== "" && currentLoanName.localeCompare(entityName) < 0 )
+            retVal = currentLoan;
+        else
+            return retVal;
+    }
+    return retVal;
+}
+
+function getLastLoanReferenceOfEntity(entityName){
+    var allLoans = getAllLoans();
     var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
     var loanReferenceColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn);
     allLoans = allLoans.filter(function (loan) {
         return loan[entityNameColS0] === entityName;
     });
+    if(allLoans.length === 0) // First loan of this entity to be imported
+        return null;
     allLoans.sort(function (a, b) {
         return b[loanReferenceColS0].localeCompare([loanReferenceColS0]);
     });
@@ -123,6 +154,8 @@ function getLastLoanOfEntity(entityName){
 }
 
 function getIncrementedLoanReference(loanReference) {
+    if(loanReference === null) // The loan to be created is the first loan of this entity, hence there is no loan reference in the sheet yet
+        return "SAMPLE000";
     // Split in two strings: letters, and digits (loan references
     // are a concatenation of a group of letters and a group of numbers
     var splittedLoanReference = loanReference.match(/[a-zA-Z]+|[0-9]+/g);
