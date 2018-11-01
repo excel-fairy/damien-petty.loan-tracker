@@ -58,7 +58,7 @@ function getOffsetOfEntityBeforeEntityToInsertAlphabeticalOrder(entityToInsertNa
         if(currentEntityName.localeCompare(entityToInsertName) > 0)
             return i + (INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.firstEntityRow - 1);
     }
-    return allEntities.length+1;
+    return allEntities.length;
 }
 
 // Duplicate row to get all the data that won't be overwritten
