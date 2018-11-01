@@ -26,21 +26,28 @@ function createEntity(data) {
 function insertEntityInEntitiesSheet(data){
     var rowToInsert = buildEntityToInsert(data);
     var entitiesOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.sheet;
-    var entityBeforeEntityToInsert = getOffsetOfEntityBeforeEntityToInsertAlphabeticalOrder(data.entityName);
-    var rangeRowToSet = entitiesOriginalSheet.getRange(entityBeforeEntityToInsert + 1,
+    var entityBeforeEntityToInsertRow = getOffsetOfEntityBeforeEntityToInsertAlphabeticalOrder(data.entityName);
+    var rangeRowToSet = entitiesOriginalSheet.getRange(entityBeforeEntityToInsertRow + 1,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.firstEntityColumn),
         1,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.lastEntityColumn)
         - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.firstEntityColumn) + 1);
 
 
-    duplicateEntityRow(entityBeforeEntityToInsert);
+    duplicateEntityRow(entityBeforeEntityToInsertRow);
     rangeRowToSet.setValues([rowToInsert]);
 
-    var rangeToDuplicateFrom = entitiesOriginalSheet.getRange(entityBeforeEntityToInsert, //Formulas to duplicate on the new row
-        ColumnNames.letterToColumn('B'), 1, ColumnNames.letterToColumn('C') - ColumnNames.letterToColumn('B') + 1);
-    var rangeToDuplicateTo = entitiesOriginalSheet.getRange(entityBeforeEntityToInsert + 1,
-        ColumnNames.letterToColumn('B'), 1, ColumnNames.letterToColumn('C') - ColumnNames.letterToColumn('B') + 1);
+    duplicateCellFromRowAbove('B', entitiesOriginalSheet, entityBeforeEntityToInsertRow + 1);
+    duplicateCellFromRowAbove('C', entitiesOriginalSheet, entityBeforeEntityToInsertRow + 1);
+    duplicateCellFromRowAbove('M', entitiesOriginalSheet, entityBeforeEntityToInsertRow + 1);
+    duplicateCellFromRowAbove('N', entitiesOriginalSheet, entityBeforeEntityToInsertRow + 1);
+}
+
+function duplicateCellFromRowAbove(columnLetter, sheet, newEntityRow) {
+    var rangeToDuplicateFrom = sheet.getRange(newEntityRow - 1,
+        ColumnNames.letterToColumn(columnLetter), 1, 1);
+    var rangeToDuplicateTo = sheet.getRange(newEntityRow,
+        ColumnNames.letterToColumn(columnLetter), 1, 1);
     rangeToDuplicateFrom.copyTo(rangeToDuplicateTo);
 }
 
@@ -92,8 +99,8 @@ function buildEntityToInsert(data) {
     row[ColumnNames.letterToColumnStart0('J')] = data.bsbNumber;
     row[ColumnNames.letterToColumnStart0('K')] = data.accountNumber;
     row[ColumnNames.letterToColumnStart0('L')] = data.firstName;
-    row[ColumnNames.letterToColumnStart0('M')] = '';
-    row[ColumnNames.letterToColumnStart0('N')] = '';
+    row[ColumnNames.letterToColumnStart0('M')] = null;
+    row[ColumnNames.letterToColumnStart0('N')] = null;
     row[ColumnNames.letterToColumnStart0('O')] = data.carbonCopyEmailAddress;
     return row;
 }
