@@ -6,7 +6,7 @@ function openCreateLoanPopup() {
     var htmlTemplate = HtmlService.createTemplateFromFile('createloan');
     htmlTemplate.data = {
         entities: getEntitiesNames(),
-        borrowers: ['Antra Group', 'Ray Petty']
+        borrowers: ['Antra Group', 'Ray Petty', 'Fundsquire Pty Ltd']
     };
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setTitle('Import loan')
