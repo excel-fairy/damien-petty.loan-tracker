@@ -35,7 +35,7 @@ function insertLoanInLoansSheet(data){
     var rangeRowToSet = loansOriginalSheet.getRange(lastEntityRow + 1,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
         1,
-        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.lastLoansColumn)
+        ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.lastLoansColumn) + 1
         - ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn));
 
     duplicateLastEntityRow(lastEntityRow);
@@ -72,8 +72,9 @@ function buildLoanToInsert(data) {
     row[ColumnNames.letterToColumnStart0('H')] = interestRatePercent;
     row[ColumnNames.letterToColumnStart0('I')] = interestRatePercent * data.amountBorrowed;
     row[ColumnNames.letterToColumnStart0('J')] = 'No';
-    row[ColumnNames.letterToColumnStart0('K')] = '';
-    row[ColumnNames.letterToColumnStart0('L')] = data.borrowerEntity;
+    row[ColumnNames.letterToColumnStart0('K')] = data.ballooninvestment;
+    row[ColumnNames.letterToColumnStart0('L')] = '';
+    row[ColumnNames.letterToColumnStart0('M')] = data.borrowerEntity;
     return row;
 }
 
