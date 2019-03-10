@@ -29,9 +29,9 @@ function exportInterestStatements() {
         else
             updateExportStatus(true);
 
-        var totalValue = INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.sheet.getRange(INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.totalCell).getValue();
+        var totalOfCurrentMonth = getTotalOfCurrentMonthForCurrentEntity();
         Utilities.sleep(sheetUpdateInterval);
-        if(totalValue !== 0){
+        if(totalOfCurrentMonth !== 0){
             exportInterestStatementForCurrentEntity();
             Utilities.sleep(gSpreadSheetRateLimitingMinInterval-sheetUpdateInterval);
         }
@@ -39,6 +39,29 @@ function exportInterestStatements() {
     }
     setCurrentlyExportingEntity('');
     updateExportStatus(false)
+}
+
+/**
+ * Get the total amount for the entity currently selected at the selected month
+ */
+function getTotalOfCurrentMonthForCurrentEntity(){
+    var allTransactions = INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.sheet.getRange(
+        INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.r1,
+        INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.c1,
+        INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.r2 - INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.r1,
+        INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.c2 - INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.transactionsRange.c1
+    ).getValues();
+    // Get the total of the last line that is not empty
+    retVal = 0;
+    for (var i = 0; i < allTransactions.length; i++){
+        var loopTransaction = allTransactions[i];
+        var loopTransactionTotal = loopTransaction[INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.totalColumn - 1]; // "-1" because transactions range starts at column B
+        if(typeof(loopTransactionTotal) === "number")
+            var retVal = loopTransactionTotal;
+        else
+            break;
+    }
+    return retVal;
 }
 
 function getCurrentlyExportingEntity() {
