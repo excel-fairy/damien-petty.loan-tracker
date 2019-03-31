@@ -88,7 +88,7 @@ function getLastLoanReferenceOfEntity(entityName) {
 
 function getLastLoanOfEntityRow(entityName) {
     var lastRow = -1;
-    var allLoans = getAllLoans();
+    var allLoans = getAllLoansFirstThreeColumns();
     var loanReference = getLastLoanReferenceOfEntity(entityName);
     if(loanReference !== null) { // A loan of this entity has already been imported
         for(var i=0; i < allLoans.length; i++){
@@ -114,7 +114,11 @@ function getLastLoanOfEntityRow(entityName) {
     }
 }
 
-function getAllLoans() {
+/**
+ * Get the first three columns of all the loans
+ * @return {Object[][]}
+ */
+function getAllLoansFirstThreeColumns() {
     var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var loansRange = loansOriginalSheet.getRange(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
@@ -125,7 +129,7 @@ function getAllLoans() {
 }
 
 function getLastLoanOfEntityBeforeThisEntity(entityName) {
-    var allLoans = getAllLoans();
+    var allLoans = getAllLoansFirstThreeColumns();
     var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
     var retVal = null;
     for (var i = 0; i < allLoans.length; i++) {
@@ -140,7 +144,7 @@ function getLastLoanOfEntityBeforeThisEntity(entityName) {
 }
 
 function getLastLoanReferenceOfEntity(entityName){
-    var allLoans = getAllLoans();
+    var allLoans = getAllLoansFirstThreeColumns();
     var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
     var loanReferenceColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn);
     allLoans = allLoans.filter(function (loan) {
