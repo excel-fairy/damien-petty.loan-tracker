@@ -1,4 +1,5 @@
 .idea/
+private-variables.js
 .clasp.dev.json
 .clasp.production.json
 .clasp.production-copy.json
