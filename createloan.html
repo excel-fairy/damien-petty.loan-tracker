@@ -16,8 +16,13 @@
     <br><br>
 
     <label>
-        Loan reference (Dacosi only):
-        <input type="text" name="loanReference" id="loan-reference-input" disabled>
+        Loan reference (MANDATORY FOR NEW ENTITIES, leave blank for automatic loan reference):
+        <input type="text" name="loanReference" pattern="[A-Z]+[0-9]{3}.*" title="Must be at least one uppercase letter, followed by exactly three digits, followed by anything">
+    </label>
+    <br><br>
+    <label>
+        Lender reference:
+        <input type="text" name="lenderReference" required>
     </label>
     <br><br>
     <label>
@@ -80,8 +85,6 @@
     function disableLoanReferenceInputIfNeeded() {
         var entitySelectDom = document.getElementById("entity-select");
         var selectedEntity = entitySelectDom.options[entitySelectDom.selectedIndex].value;
-        document.getElementById("loan-reference-input").disabled = !(selectedEntity === 'Dacosi Investments Pty Ltd (Derek Goh)' || selectedEntity === 'Dacosi ST Pty Ltd (Derek Goh)');
     }
-//# sourceURL=somename.js
 
 </script>

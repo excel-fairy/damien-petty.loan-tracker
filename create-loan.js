@@ -11,7 +11,7 @@ function openCreateLoanPopup() {
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setTitle('Import loan')
         .setWidth(705)
-        .setHeight(400);
+        .setHeight(500);
     SpreadsheetApp.getUi().showDialog(htmlOutput);
 }
 
@@ -27,7 +27,7 @@ function createLoan(data) {
 
 function insertLoanInLoansSheet(data){
     // Override loanReference (autocomputed) only if the entity is none of the below
-    if(data.entityName !== 'Dacosi Investments Pty Ltd (Derek Goh)' && data.entityName !== 'Dacosi ST Pty Ltd (Derek Goh)')
+    if(data.loanReference === '')
         data.loanReference =  getIncrementedLoanReference(getLastLoanReferenceOfEntity(data.entityName));
     var rowToInsert = buildLoanToInsert(data);
     var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
@@ -63,7 +63,7 @@ function buildLoanToInsert(data) {
     var row = [];
     var interestRatePercent = data.interestRate / 100;
     row[ColumnNames.letterToColumnStart0('A')] = data.loanReference;
-    row[ColumnNames.letterToColumnStart0('B')] = '';
+    row[ColumnNames.letterToColumnStart0('B')] = data.lenderReference;
     row[ColumnNames.letterToColumnStart0('C')] = data.entityName;
     row[ColumnNames.letterToColumnStart0('D')] = data.amountBorrowed;
     row[ColumnNames.letterToColumnStart0('E')] = data.dateBorrowed;
@@ -75,6 +75,8 @@ function buildLoanToInsert(data) {
     row[ColumnNames.letterToColumnStart0('K')] = data.ballooninvestment;
     row[ColumnNames.letterToColumnStart0('L')] = '';
     row[ColumnNames.letterToColumnStart0('M')] = data.borrowerEntity;
+    row[ColumnNames.letterToColumnStart0('N')] = '';
+
     return row;
 }
 
@@ -88,7 +90,7 @@ function getLastLoanReferenceOfEntity(entityName) {
 
 function getLastLoanOfEntityRow(entityName) {
     var lastRow = -1;
-    var allLoans = getAllLoansFirstThreeColumns();
+    var allLoans = getAllLoans();
     var loanReference = getLastLoanReferenceOfEntity(entityName);
     if(loanReference !== null) { // A loan of this entity has already been imported
         for(var i=0; i < allLoans.length; i++){
@@ -99,7 +101,7 @@ function getLastLoanOfEntityRow(entityName) {
         return lastRow;
     }
     else { // First loan of this entity to be imported
-        var beforeEntityLoan = getLastLoanOfEntityBeforeThisEntity(entityName);
+       /* var beforeEntityLoan = getLastLoanOfEntityBeforeThisEntity(entityName);
         if(beforeEntityLoan !== null) {
             var beforeEntityName = beforeEntityLoan[ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn)];
             for (var i = 0; i < allLoans.length; i++) {
@@ -110,15 +112,17 @@ function getLastLoanOfEntityRow(entityName) {
             return lastRow;
         }
         else // First loan of this entity to be imported and no entity with a name before this one in the list of loans
-            return INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1;
+            return INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow - 1;*/
+            
+        // Add the loan at the end of the loan list (several empty lines at the end of the loans list need to be ignoredà
+        var row = 0;
+        while (row < allLoans.length && allLoans[row][ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn)] !== '')
+            row++;
+        return row + 2;  // 2 Because of the two header lines
     }
 }
 
-/**
- * Get the first three columns of all the loans
- * @return {Object[][]}
- */
-function getAllLoansFirstThreeColumns() {
+function getAllLoans() {
     var loansOriginalSheet = INTEREST_STATEMENT_SPREADSHEET.loansSheet.sheet;
     var loansRange = loansOriginalSheet.getRange(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoanRow,
         ColumnNames.letterToColumn(INTEREST_STATEMENT_SPREADSHEET.loansSheet.firstLoansColumn),
@@ -129,7 +133,7 @@ function getAllLoansFirstThreeColumns() {
 }
 
 function getLastLoanOfEntityBeforeThisEntity(entityName) {
-    var allLoans = getAllLoansFirstThreeColumns();
+    var allLoans = getAllLoans();
     var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
     var retVal = null;
     for (var i = 0; i < allLoans.length; i++) {
@@ -144,7 +148,7 @@ function getLastLoanOfEntityBeforeThisEntity(entityName) {
 }
 
 function getLastLoanReferenceOfEntity(entityName){
-    var allLoans = getAllLoansFirstThreeColumns();
+    var allLoans = getAllLoans();
     var entityNameColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.entityNameColumn);
     var loanReferenceColS0 = ColumnNames.letterToColumnStart0(INTEREST_STATEMENT_SPREADSHEET.loansSheet.loanReferenceColumn);
     allLoans = allLoans.filter(function (loan) {
@@ -158,19 +162,21 @@ function getLastLoanReferenceOfEntity(entityName){
     return allLoans[allLoans.length-1][loanReferenceColS0];
 }
 
-function getIncrementedLoanReference(loanReference) {
-    if(loanReference === null) // The loan to be created is the first loan of this entity, hence there is no loan reference in the sheet yet
-        return "SAMPLE000";
+function getIncrementedLoanReference(previousLoanReference) {
+    if(previousLoanReference === null) // The loan to be created is the first loan of this entity, hence there is no loan reference in the sheet yet
+        return "LOAN001";
     // Split in two strings: letters, and digits (loan references
     // are a concatenation of a group of letters and a group of numbers
-    var splittedLoanReference = loanReference.match(/[a-zA-Z]+|[0-9]+/g);
-    var loanNumberStr = splittedLoanReference[1];
-    var loanNumberStrLength = loanNumberStr.length;
-    var loanNumber = parseInt(loanNumberStr, 10);
-    var incrementedLoanNumber = loanNumber+1;
+    var splittedOldLoanReference = (/([A-Z]+)([0-9]{3}).*/g).exec(previousLoanReference);
+    var oldLoanNumberStr = splittedOldLoanReference[2];
+    var oldLoanNumber = parseInt(oldLoanNumberStr, 10);
+    var incrementedLoanNumber = oldLoanNumber+1;
+    if(incrementedLoanNumber > 999)
+        incrementedLoanNumber = 999
     var incrementedLoanNumberStr = ""+incrementedLoanNumber;
-    while (incrementedLoanNumberStr.length < loanNumberStrLength) {
+    Logger.log(incrementedLoanNumberStr);
+    while (incrementedLoanNumberStr.length < 3) {
         incrementedLoanNumberStr = "0" + incrementedLoanNumberStr;
     }
-    return splittedLoanReference[0] + incrementedLoanNumberStr;
+    return splittedOldLoanReference[1] + incrementedLoanNumberStr;
 }
