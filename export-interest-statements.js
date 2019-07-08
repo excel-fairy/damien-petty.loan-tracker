@@ -111,24 +111,41 @@ function exportInterestStatementForCurrentEntityAndBorrower(){
 
 function sendEmail(attachment) {
     var entityName = getCurrentlyExportingEntityFromInterestStatement();
-    var borrowerName = getCurrentlyExportingBorrowerFromInterestStatement();
     var entity = getEntityFromName(entityName);
     if(!entity)
         SpreadsheetApp.getActiveSpreadsheet().toast('Entity ' + entityName + ' not found in entities list. No email sent');
     else {
+
         var recipient = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailAddressColumn];
-        var subjectTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailSubjectColumn];
-        var subject = fillBorrower(subjectTemplate, borrowerName);
-        var messageTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailBodyColumn];
-        var message = fillBorrower(messageTemplate, borrowerName);
         var carbonCopyEmailAddresses = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.carbonCopyEmailAddressesColumn];
-        var emailOptions = {
+
+        var borrowerName = getCurrentlyExportingBorrowerFromInterestStatement();
+        var date = INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.sheet.getRange(INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.dateCell).getValue();
+        var subjectTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailSubjectColumn];
+        var subject = fillBorrowerAndDate(subjectTemplate, borrowerName, date);
+        // var messageTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailBodyColumn];
+        var messageTemplate =  HtmlService.createHtmlOutputFromFile("email-body.html").getContent();
+        var message = fillBorrowerAndDate(messageTemplate, borrowerName, date);
+
+        var emailSignatureImagesFolder = DriveApp.getFolderById(EMAIL_SIGNATURE_IMAGES_FOLDER_ID);
+        var signatureImage1Blob = emailSignatureImagesFolder.getFilesByName("signature-image-1.jpg").next().getBlob();
+        var signatureImage2Blob = emailSignatureImagesFolder.getFilesByName("signature-image-2.jpg").next().getBlob();
+
+
+        MailApp.sendEmail({
+            name: "Kylie Wynne",
+            to: recipient,
+            subject: subject,
+            htmlBody: message,
+            inlineImages: {
+                signatureImage1: signatureImage1Blob,
+                signatureImage2: signatureImage2Blob
+            },
             attachments: [attachment.getAs(MimeType.PDF)],
             name: borrowerName,
             cc: carbonCopyEmailAddresses
-        };
-        MailApp.sendEmail(recipient, subject, message, emailOptions);
-    }
+        });
+    };
 }
 
 
@@ -204,7 +221,10 @@ function setCurrentlyExportingBorrower(borrower) {
  * Replace the string "{borrower}" in a template string
  * @param templateString template
  * @param borrower Borrower to inject in the template
+ * @param borrower Date to inject in the template
  */
-function fillBorrower(templateString, borrower){
-    return templateString.replace("{borrower}", borrower);
+function fillBorrowerAndDate(templateString, borrower, date){
+    return templateString
+        .replace("{borrower}", borrower)
+        .replace("{date}", date);
 }
