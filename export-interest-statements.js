@@ -101,6 +101,7 @@ function exportInterestStatementForCurrentEntityAndBorrower(){
     var exportFolderId = getFolderToExportPdfTo(EXPORT_FOLDER_ID, dateStr).getId();
 
     var exportOptions = {
+        sheetId: INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.sheet.getSheetId(),
         exportFolderId: exportFolderId,
         exportFileName: fileName,
         range: INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.pdfExportRange
@@ -121,9 +122,7 @@ function sendEmail(attachment) {
 
         var borrowerName = getCurrentlyExportingBorrowerFromInterestStatement();
         var date = INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.sheet.getRange(INTEREST_STATEMENT_SPREADSHEET.interestStatementSheet.dateCell).getValue();
-        var subjectTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailSubjectColumn];
-        var subject = fillBorrowerAndDate(subjectTemplate, borrowerName, date);
-        // var messageTemplate = entity[INTEREST_STATEMENT_SPREADSHEET.entitiesSheet.emailBodyColumn];
+        var subject = entityName + ' (' + borrowerName + ') Monthly interest - ' + date;
         var messageTemplate =  HtmlService.createHtmlOutputFromFile("email-body.html").getContent();
         var message = fillBorrowerAndDate(messageTemplate, borrowerName, date);
 

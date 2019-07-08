@@ -3,17 +3,15 @@ var INTEREST_STATEMENT_SPREADSHEET = {
         sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Entity"),
         firstEntityRow: 3,
         firstEntityColumn: 'A',
-        lastEntityColumn: 'O',
+        lastEntityColumn: 'M',
         entityNameColumn: 'A',
         emailAddressColumn: ColumnNames.letterToColumnStart0('G'),
-        emailSubjectColumn: ColumnNames.letterToColumnStart0('M'),
-        emailBodyColumn: ColumnNames.letterToColumnStart0('N'),
-        carbonCopyEmailAddressesColumn: ColumnNames.letterToColumnStart0('O'),
+        carbonCopyEmailAddressesColumn: ColumnNames.letterToColumnStart0('M'),
         entitiesListRange:{
             r1: 3,
             r2: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Entity").getLastRow(),
             c1: ColumnNames.letterToColumn('A'),
-            c2: ColumnNames.letterToColumn('O')
+            c2: ColumnNames.letterToColumn('M')
         }
     },
     interestStatementSheet: {

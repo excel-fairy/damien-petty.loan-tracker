@@ -99,8 +99,6 @@ function buildEntityToInsert(data) {
     row[ColumnNames.letterToColumnStart0('J')] = data.bsbNumber;
     row[ColumnNames.letterToColumnStart0('K')] = data.accountNumber;
     row[ColumnNames.letterToColumnStart0('L')] = data.firstName;
-    row[ColumnNames.letterToColumnStart0('M')] = null;
-    row[ColumnNames.letterToColumnStart0('N')] = null;
-    row[ColumnNames.letterToColumnStart0('O')] = data.carbonCopyEmailAddress;
+    row[ColumnNames.letterToColumnStart0('M')] = data.carbonCopyEmailAddress;
     return row;
 }
